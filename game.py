@@ -23,15 +23,12 @@ def updateHandValue(hand, hand_value):
         card_value = getCardValue(card)
         if card_value == "A":
             if hand_value + 11 > 21:
-                print(f"adding 1 to {hand_value}")
                 hand_value = hand_value + 1
                 num = num + 1
             else:
-                print(f"adding 11 to {hand_value}")
                 hand_value = hand_value + 11
                 num = num + 1
         else:
-            print(f"adding {card_value} to {hand_value}")
             hand_value = hand_value + card_value
             num = num + 1
     return hand_value
