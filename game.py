@@ -20,21 +20,31 @@ def updateHandValue(hand, hand_value):
     num = 0
     for x in hand:
         card = hand[num]
-        try:
-            int(card.face)
-        except ValueError:
-            if card.face == "A":
-                if hand_value + 11 > 21:
-                    hand_value = hand_value + 1
-                else:
-                    hand_value = hand_value + 11
+        card_value = getCardValue(card)
+        if card_value == "A":
+            if hand_value + 11 > 21:
+                hand_value = hand_value + 1
+                num = num + 1
             else:
-                hand_value = hand_value + 10
+                hand_value = hand_value + 11
+                num = num + 1
         else:
-            hand_value = hand_value + int(card.face)
-        finally:
+            hand_value = hand_value + card_value
             num = num + 1
     return hand_value
+
+def getCardValue(card):
+    val = 0
+    try:
+        int(card.face)
+    except ValueError:
+        if card.face == "A":
+            val = "A"
+        else:
+            val = 10
+    else:
+        val = int(card.face)
+    return val
 
 playerHand = []
 dealerHand = []
@@ -59,7 +69,7 @@ while isDealerTurn == False:
     ''')
     print(f'''The dealer shows:
     {dealerHand[1]}
-    Score: {"not implemented yet im not gonna lie"}
+    Score: {getCardValue(dealerHand[1])}
     ''')
 
     if playerHandValue > 21:
@@ -67,11 +77,11 @@ while isDealerTurn == False:
         playerHandValue = 0
         isDealerTurn = True
     else:
-        option_taken = input("""What do you want to do? You can:
+        option_taken = input('''What do you want to do? You can:
         Hit
         Stand
 
-        """)
+        ''')
         if option_taken == "Hit" or option_taken == "hit" or option_taken == "H" or option_taken == "h":
             dealCard(deck, playerHand)
             playerHandValue = updateHandValue(playerHand, playerHandValue)
@@ -89,6 +99,11 @@ if isDealerTurn == True:
         {dealerHand}
         Score: {dealerHandValue}
         ''')
+    if dealerHandValue > 21:
+        dealerHandValue = 0
+        isDealerTurn = False
+print('Your score is:', playerHandValue)
+print('The dealer\'s score is:', dealerHandValue)
 if dealerHandValue == playerHandValue:
     print('Tie!')
 elif dealerHandValue > playerHandValue:
