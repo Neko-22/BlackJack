@@ -75,7 +75,7 @@ def gameLogic():
 
         if playerHandValue > 21:
             print(f"Bust! You automatically lose.")
-            playerHandValue = 0
+            playerHandValue = -1
             time.sleep(1.5)
             isDealerTurn = True
         elif playerHandValue == 21:
@@ -109,7 +109,7 @@ def gameLogic():
             Score: {dealerHandValue}
             ''')
         if dealerHandValue > 21:
-            dealerHandValue = 0
+            dealerHandValue = -1
             isDealerTurn = False
     print('Your score is:', playerHandValue)
     print('The dealer\'s score is:', dealerHandValue)
@@ -119,13 +119,13 @@ def gameLogic():
         print('You Lose!')
     else:
         print('You Win!')
-    playAgain = input("""Would you like to play again?
-Yes/no (default answer is Yes, any other text entered will close the game): """)
+    playAgain = input('''Would you like to play again?
+Yes/no (default answer is Yes, any other text entered will close the game): ''')
     if playAgain == "" or playAgain == "y" or playAgain == "Y" or playAgain == "Yes" or playAgain == "yes":
         gameLogic()
 
 
-begin = input("""Welcome to Console Blackjack!
-Press enter to begin.""")
-if begin == "":
+begin = input('''Welcome to Console Blackjack!
+Press enter to begin.''')
+if begin == '':
     gameLogic()
