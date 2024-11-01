@@ -1,5 +1,6 @@
 import itertools
 import random
+import time
 
 suits = ["Diamonds", "Hearts", "Spades", "Clubs"]
 faces = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
@@ -46,69 +47,85 @@ def getCardValue(card):
         val = int(card.face)
     return val
 
-playerHand = []
-dealerHand = []
-playerHandValue = 0
-dealerHandValue = 0
+def gameLogic():
+    playerHand = []
+    dealerHand = []
+    playerHandValue = 0
+    dealerHandValue = 0
 
-# Game logic
-random.shuffle(deck)
+    random.shuffle(deck)
 
-dealCard(deck, playerHand)
-dealCard(deck, playerHand)
-dealCard(deck, dealerHand)
-dealCard(deck, dealerHand)
-playerHandValue = updateHandValue(playerHand, playerHandValue)
-dealerHandValue = updateHandValue(dealerHand, dealerHandValue)
-isDealerTurn = False
+    dealCard(deck, playerHand)
+    dealCard(deck, playerHand)
+    dealCard(deck, dealerHand)
+    dealCard(deck, dealerHand)
+    playerHandValue = updateHandValue(playerHand, playerHandValue)
+    dealerHandValue = updateHandValue(dealerHand, dealerHandValue)
+    isDealerTurn = False
 
-while isDealerTurn == False:
-    print(f'''Your hand is:
-    {playerHand}
-    Score: {playerHandValue}
-    ''')
-    print(f'''The dealer shows:
-    {dealerHand[1]}
-    Score: {getCardValue(dealerHand[1])}
-    ''')
-
-    if playerHandValue > 21:
-        print(f"Bust! You automatically lose.")
-        playerHandValue = 0
-        isDealerTurn = True
-    else:
-        option_taken = input('''What do you want to do? You can:
-        Hit
-        Stand
-
+    while isDealerTurn == False:
+        print(f'''Your hand is:
+        {playerHand}
+        Score: {playerHandValue}
         ''')
-        if option_taken == "Hit" or option_taken == "hit" or option_taken == "H" or option_taken == "h":
-            dealCard(deck, playerHand)
+        print(f'''The dealer shows:
+        {dealerHand[1]}
+        Score: {getCardValue(dealerHand[1])}
+        ''')
+
+        if playerHandValue > 21:
+            print(f"Bust! You automatically lose.")
             playerHandValue = 0
-            playerHandValue = updateHandValue(playerHand, playerHandValue)
-        elif option_taken == "Stand" or option_taken == "stand" or option_taken == "S" or option_taken == "s":
+            time.sleep(1.5)
             isDealerTurn = True
-if isDealerTurn == True:
-    print(f'''The dealer now shows:
-    {dealerHand}
-    Score: {dealerHandValue}
-    ''')
-    while dealerHandValue < 17:
-        dealCard(deck, dealerHand)
-        dealerHandValue = 0
-        dealerHandValue = updateHandValue(dealerHand, dealerHandValue)
+        elif playerHandValue == 21:
+            print(f"Blackjack!")
+            time.sleep(1)
+            isDealerTurn = True
+        else:
+            option_taken = input('''What do you want to do? You can:
+            Hit
+            Stand
+
+            ''')
+            if option_taken == "Hit" or option_taken == "hit" or option_taken == "H" or option_taken == "h":
+                dealCard(deck, playerHand)
+                playerHandValue = 0
+                playerHandValue = updateHandValue(playerHand, playerHandValue)
+            elif option_taken == "Stand" or option_taken == "stand" or option_taken == "S" or option_taken == "s":
+                isDealerTurn = True
+    if isDealerTurn == True:
         print(f'''The dealer now shows:
         {dealerHand}
         Score: {dealerHandValue}
         ''')
-    if dealerHandValue > 21:
-        dealerHandValue = 0
-        isDealerTurn = False
-print('Your score is:', playerHandValue)
-print('The dealer\'s score is:', dealerHandValue)
-if dealerHandValue == playerHandValue:
-    print('Tie!')
-elif dealerHandValue > playerHandValue:
-    print('You Lose!')
-else:
-    print('You Win!')
+        while dealerHandValue < 17:
+            dealCard(deck, dealerHand)
+            dealerHandValue = 0
+            dealerHandValue = updateHandValue(dealerHand, dealerHandValue)
+            time.sleep(1)
+            print(f'''The dealer now shows:
+            {dealerHand}
+            Score: {dealerHandValue}
+            ''')
+        if dealerHandValue > 21:
+            dealerHandValue = 0
+            isDealerTurn = False
+    print('Your score is:', playerHandValue)
+    print('The dealer\'s score is:', dealerHandValue)
+    if dealerHandValue == playerHandValue:
+        print('Tie!')
+    elif dealerHandValue > playerHandValue:
+        print('You Lose!')
+    else:
+        print('You Win!')
+    playAgain = input("""Would you like to play again?
+Yes/no (default answer is Yes, any other text entered will close the game): """)
+    if playAgain == "" or playAgain == "y" or playAgain == "Y" or playAgain == "Yes" or playAgain == "yes":
+        gameLogic()
+
+
+begin = input("""Welcome to Console Blackjack!
+Press enter to begin.""")
+if begin == "":
+    gameLogic()
