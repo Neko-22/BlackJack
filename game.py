@@ -23,12 +23,15 @@ def updateHandValue(hand, hand_value):
         card_value = getCardValue(card)
         if card_value == "A":
             if hand_value + 11 > 21:
+                print(f"adding 1 to {hand_value}")
                 hand_value = hand_value + 1
                 num = num + 1
             else:
+                print(f"adding 11 to {hand_value}")
                 hand_value = hand_value + 11
                 num = num + 1
         else:
+            print(f"adding {card_value} to {hand_value}")
             hand_value = hand_value + card_value
             num = num + 1
     return hand_value
@@ -84,6 +87,7 @@ while isDealerTurn == False:
         ''')
         if option_taken == "Hit" or option_taken == "hit" or option_taken == "H" or option_taken == "h":
             dealCard(deck, playerHand)
+            playerHandValue = 0
             playerHandValue = updateHandValue(playerHand, playerHandValue)
         elif option_taken == "Stand" or option_taken == "stand" or option_taken == "S" or option_taken == "s":
             isDealerTurn = True
@@ -94,6 +98,7 @@ if isDealerTurn == True:
     ''')
     while dealerHandValue < 17:
         dealCard(deck, dealerHand)
+        dealerHandValue = 0
         dealerHandValue = updateHandValue(dealerHand, dealerHandValue)
         print(f'''The dealer now shows:
         {dealerHand}
