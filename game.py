@@ -26,13 +26,11 @@ def updateHandValue(hand, hand_value):
         if card_value == "A":
             if hand_value + 11 > 21:
                 hand_value = hand_value + 1
-                num = num + 1
             else:
                 hand_value = hand_value + 11
-                num = num + 1
         else:
             hand_value = hand_value + card_value
-            num = num + 1
+        num += 1
     return hand_value
 
 def getCardValue(card):
@@ -50,27 +48,73 @@ def getCardValue(card):
 
 root = Tk()
 root.title("Blackjack")
-root.geometry("800x500")
-root.resizable(False, False)
-root.config(bg='#009900')
+root.geometry("650x400")
+#root.resizable(False, False)
+root.config(bg='#63B76C')
 
 
-lb1 = Label(root, text="Player Hand", font=("Helvetica", 15), bg='#009900')
-lb1.place(x=30, y=20)
-lb2 = Label(root, text="Player Score", font=("Helvetica", 15), bg='#009900')
-lb2.place(x=30, y=50)
-lb3 = Label(root, text="Dealer Hand", font=("Helvetica", 15), bg='#009900')
-lb3.place(x=30, y=110)
-lb4 = Label(root, text="Dealer Score", font=("Helvetica", 15), bg='#009900')
-lb4.place(x=30, y=140)
+lb1 = Label(root, text="Player Cards:", font=("Source Code Pro", 15), bg='#63B76C')
+lb1.place(x=10, y=20)
+lb2 = Label(root, text="Player Score:", font=("Source Code Pro", 15), bg='#63B76C')
+lb2.place(x=10, y=50)
+lb3 = Label(root, text="Dealer Cards:", font=("Source Code Pro", 15), bg='#63B76C')
+lb3.place(x=10, y=110)
+lb4 = Label(root, text="Dealer Score:", font=("Source Code Pro", 15), bg='#63B76C')
+lb4.place(x=10, y=140)
+lb5 = Label(root, text="Let's have some fun!", font=("Source Code Pro", 15), bg='#63B76C')
+lb5.place(x=10, y=170)
+
+playerHand = []
+dealerHand = []
+playerHandValue = 0
+dealerHandValue = 0
+
+def checkPoints():
+    global isDealerTurn
+    global isPlayerTurn
+    global playerHandValue
+    if playerHandValue > 21:
+        lb1.config(text=f"Player Cards: {playerHand}")
+        lb2.config(text=f"Player Score: {playerHandValue}  BUST!")
+        playerHandValue = -1
+        dealerTurn()
+    elif playerHandValue == 21:
+        lb1.config(text=f"Player Cards: {playerHand}")
+        lb2.config(text=f"Player Score: {playerHandValue}  BLACKJACK!")
+        dealerTurn()
+
+def hit():
+    global playerHandValue
+    dealCard(deck, playerHand)
+    playerHandValue = 0
+    playerHandValue = updateHandValue(playerHand, playerHandValue)
+    lb1.config(text=f"Player Cards: {playerHand}")
+    lb2.config(text=f"Player Score: {playerHandValue}")
+    checkPoints()
+    
+def stand():
+    dealerTurn()
+
 
 def gameLogic():
+    global playerHandValue
+    global playerHand
+    global dealerHand
+    global dealerHandValue
+    global isDealerTurn
+    global isPlayerTurn
+    global deck
+
+    btn2.configure(state=NORMAL)
+    btn3.configure(state=NORMAL)
+
+    deck = [Card(suit,face) for suit, face in itertools.product(suits, faces)]
+    random.shuffle(deck)
+
     playerHand = []
     dealerHand = []
     playerHandValue = 0
     dealerHandValue = 0
-
-    random.shuffle(deck)
 
     dealCard(deck, playerHand)
     dealCard(deck, playerHand)
@@ -78,68 +122,47 @@ def gameLogic():
     dealCard(deck, dealerHand)
     playerHandValue = updateHandValue(playerHand, playerHandValue)
     dealerHandValue = updateHandValue(dealerHand, dealerHandValue)
-    isDealerTurn = False
 
-    while isDealerTurn == False:
-        lb1.config(text=f"Player Cards: {playerHand}")
-        lb2.config(text=f"Player Score: {playerHandValue}")
-        lb3.config(text=f"Dealer Cards: {dealerHand[1]}")
-        lb4.config(text=f"Dealer Score: {getCardValue(dealerHand[1])}")
+    lb1.config(text=f"Player Cards: {playerHand}")
+    lb2.config(text=f"Player Score: {playerHandValue}")
+    lb3.config(text=f"Dealer Cards: {dealerHand[1]}")
+    lb4.config(text=f"Dealer Score: {getCardValue(dealerHand[1])}")
+    lb5.config(text=f"Let's have some fun!")
 
-        if playerHandValue > 21:
-            print(f"Bust! You automatically lose.")
-            lb1.config(text=f"Player Cards: {playerHand}")
-            lb2.config(text=f"Player Score: {playerHandValue}")
-            playerHandValue = -1
-            time.sleep(1.5)
-            isDealerTurn = True
-        elif playerHandValue == 21:
-            print(f"Blackjack!")
-            lb1.config(text=f"Player Cards: {playerHand}")
-            lb2.config(text=f"Player Score: {playerHandValue}")
-            time.sleep(1)
-            isDealerTurn = True
-        else:
-            option_taken = input('''What do you want to do? You can:
-            Hit
-            Stand
+    checkPoints()
 
-            ''')
-            if option_taken == "Hit" or option_taken == "hit" or option_taken == "H" or option_taken == "h":
-                dealCard(deck, playerHand)
-                playerHandValue = 0
-                playerHandValue = updateHandValue(playerHand, playerHandValue)
-                lb1.config(text=f"Player Cards: {playerHand}")
-                lb2.config(text=f"Player Score: {playerHandValue}")
-            elif option_taken == "Stand" or option_taken == "stand" or option_taken == "S" or option_taken == "s":
-                isDealerTurn = True
-    if isDealerTurn == True:
+def endGame():
+    if dealerHandValue == playerHandValue:
+        lb5.config(text=f"It's a Tie!")
+    elif dealerHandValue > playerHandValue:
+        lb5.config(text=f"You lose! Sorry!")
+    else:
+        lb5.config(text=f"You win! Congratulations!")
+
+def dealerTurn ():
+    global dealerHand
+    global dealerHandValue
+    btn2.configure(state=DISABLED)
+    btn3.configure(state=DISABLED)
+    lb3.config(text=f"Dealer Cards: {dealerHand}")
+    lb4.config(text=f"Dealer Score: {dealerHandValue}")
+    while dealerHandValue < 17:
+        dealCard(deck, dealerHand)
+        dealerHandValue = 0
+        dealerHandValue = updateHandValue(dealerHand, dealerHandValue)
+        time.sleep(1)
         lb3.config(text=f"Dealer Cards: {dealerHand}")
         lb4.config(text=f"Dealer Score: {dealerHandValue}")
-        while dealerHandValue < 17:
-            dealCard(deck, dealerHand)
-            dealerHandValue = 0
-            dealerHandValue = updateHandValue(dealerHand, dealerHandValue)
-            time.sleep(1)
-            lb3.config(text=f"Dealer Cards: {dealerHand}")
-            lb4.config(text=f"Dealer Score: {dealerHandValue}")
-        if dealerHandValue > 21:
-            dealerHandValue = -1
-            isDealerTurn = False
-    print('Your score is:', playerHandValue)
-    print('The dealer\'s score is:', dealerHandValue)
-    if dealerHandValue == playerHandValue:
-        print('Tie!')
-    elif dealerHandValue > playerHandValue:
-        print('You Lose!')
-    else:
-        print('You Win!')
-    playAgain = input('''Would you like to play again?
-Yes/no (default answer is Yes, any other text entered will close the game): ''')
-    if playAgain == "" or playAgain == "y" or playAgain == "Y" or playAgain == "Yes" or playAgain == "yes":
-        gameLogic()
+    if dealerHandValue > 21:
+        lb3.config(text=f"Dealer Cards: {dealerHand}")
+        lb4.config(text=f"Dealer Score: {dealerHandValue} BUST!")
+        dealerHandValue = -1
+    endGame()
 
-btn = Button(root, text="Play Round", font=("Helvetica", 15), bd=5, bg='#8B8386', fg='White', command=gameLogic)
-btn.place(x=115, y=200)
-
+btn = Button(root, text="Play Round", font=("Source Code Pro", 15), bd=5, bg='#8B8386', fg='White', command=gameLogic)
+btn.place(x=115, y=210)
+btn2 = Button(root, text="Hit", font=("Source Code Pro", 15), bd=5, bg='#8B8386', fg='White', command=hit)
+btn2.place(x=115, y=260)
+btn3 = Button(root, text="Stand", font=("Source Code Pro", 15), bd=5, bg='#8B8386', fg='White', command=stand)
+btn3.place(x=115, y=310)
 root.mainloop()
